@@ -38,9 +38,6 @@ export default defineConfig({
         items: [
           { text: 'List Creators', link: '/endpoints/creators/list-creators' },
           { text: 'Get Creator', link: '/endpoints/creators/get-creator' },
-          { text: 'Create Creator', link: '/endpoints/creators/create-creator' },
-          { text: 'Update Creator', link: '/endpoints/creators/update-creator' },
-          { text: 'Delete Creator', link: '/endpoints/creators/delete-creator' },
           { text: 'Get Creator Posts', link: '/endpoints/creators/get-creator-posts' },
           { text: 'Get Fields', link: '/endpoints/creators/get-fields' },
           { text: 'Get Sources', link: '/endpoints/creators/get-sources' },

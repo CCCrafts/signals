@@ -32,9 +32,6 @@ Base URL: https://api.signals.actor/v1
 ### Creators
 - [List Creators](/raw/endpoints/creators/list-creators.md) - GET /v1/creators — Paginated list with filtering
 - [Get Creator](/raw/endpoints/creators/get-creator.md) - GET /v1/creators/:id — Single creator details
-- [Create Creator](/raw/endpoints/creators/create-creator.md) - POST /v1/creators — Add a new creator
-- [Update Creator](/raw/endpoints/creators/update-creator.md) - PUT /v1/creators/:id — Update creator fields
-- [Delete Creator](/raw/endpoints/creators/delete-creator.md) - DELETE /v1/creators/:id — Remove a creator
 - [Get Creator Posts](/raw/endpoints/creators/get-creator-posts.md) - GET /v1/creators/:id/posts — Posts by creator
 - [Get Fields](/raw/endpoints/creators/get-fields.md) - GET /v1/creators/fields — Available creator fields
 - [Get Sources](/raw/endpoints/creators/get-sources.md) - GET /v1/creators/sources — Source type options
