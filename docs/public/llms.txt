@@ -1,0 +1,162 @@
+# signals.actor API
+
+> Creator intelligence platform for tracking, analyzing, and engaging with LinkedIn creators at scale.
+
+## Overview
+
+signals.actor provides a REST API for managing creator profiles, scraping LinkedIn posts, building lists, defining content signals, generating leads, and AI-powered analysis. All requests require an API key via the `X-API-Key` header.
+
+Base URL: https://api.signals.actor/v1
+
+## Documentation
+
+- Website: https://docs.signals.actor
+- Raw markdown: https://docs.signals.actor/raw/{path}.md
+- Full docs: https://docs.signals.actor/llms-full.txt
+
+## Getting Started
+
+- [Getting Started](/raw/getting-started.md)
+- [Authentication](/raw/authentication.md)
+
+## Guides
+
+- [Pagination & Filtering](/raw/guides/pagination-and-filtering.md)
+- [Error Handling](/raw/guides/error-handling.md)
+- [Rate Limits](/raw/guides/rate-limits.md)
+- [Credits & Billing](/raw/guides/credits-and-billing.md)
+- [Team Scoping](/raw/guides/team-scoping.md)
+
+## API Endpoints
+
+### Creators
+- [List Creators](/raw/endpoints/creators/list-creators.md) - GET /v1/creators — Paginated list with filtering
+- [Get Creator](/raw/endpoints/creators/get-creator.md) - GET /v1/creators/:id — Single creator details
+- [Create Creator](/raw/endpoints/creators/create-creator.md) - POST /v1/creators — Add a new creator
+- [Update Creator](/raw/endpoints/creators/update-creator.md) - PUT /v1/creators/:id — Update creator fields
+- [Delete Creator](/raw/endpoints/creators/delete-creator.md) - DELETE /v1/creators/:id — Remove a creator
+- [Get Creator Posts](/raw/endpoints/creators/get-creator-posts.md) - GET /v1/creators/:id/posts — Posts by creator
+- [Get Fields](/raw/endpoints/creators/get-fields.md) - GET /v1/creators/fields — Available creator fields
+- [Get Sources](/raw/endpoints/creators/get-sources.md) - GET /v1/creators/sources — Source type options
+- [Get Verticals](/raw/endpoints/creators/get-verticals.md) - GET /v1/creators/verticals — Vertical categories
+- [Get AI Tags](/raw/endpoints/creators/get-ai-tags.md) - GET /v1/creators/ai-tags — AI-generated tags
+
+### Posts
+- [List Posts](/raw/endpoints/posts/list-posts.md) - GET /v1/posts — Search and filter posts
+- [Get Post](/raw/endpoints/posts/get-post.md) - GET /v1/posts/:id — Single post details
+- [Delete Post](/raw/endpoints/posts/delete-post.md) - DELETE /v1/posts/:id — Remove a post
+- [Toggle Bookmark](/raw/endpoints/posts/toggle-bookmark.md) - POST /v1/posts/:id/bookmark — Bookmark/unbookmark
+- [Get Bookmarks](/raw/endpoints/posts/get-bookmarks.md) - GET /v1/posts/bookmarks — List bookmarked posts
+- [Get Period Stats](/raw/endpoints/posts/get-period-stats.md) - GET /v1/posts/period-stats — Posts over time
+- [Get Virality Stats](/raw/endpoints/posts/get-virality-stats.md) - GET /v1/posts/virality-stats — Virality metrics
+- [Get Top Engagement](/raw/endpoints/posts/get-top-engagement.md) - GET /v1/posts/top-engagement — Top posts
+- [Get Companies List](/raw/endpoints/posts/get-companies-list.md) - GET /v1/posts/companies — Companies in posts
+
+### Lists
+- [List Lists](/raw/endpoints/lists/list-lists.md) - GET /v1/lists — All lists
+- [Get List](/raw/endpoints/lists/get-list.md) - GET /v1/lists/:id — List details with members
+- [Create List](/raw/endpoints/lists/create-list.md) - POST /v1/lists — Create a new list
+- [Update List](/raw/endpoints/lists/update-list.md) - PUT /v1/lists/:id — Update list metadata
+- [Delete List](/raw/endpoints/lists/delete-list.md) - DELETE /v1/lists/:id — Delete a list
+- [Add Members](/raw/endpoints/lists/add-members.md) - POST /v1/lists/:id/creators — Add creators
+- [Remove Members](/raw/endpoints/lists/remove-members.md) - DELETE /v1/lists/:id/creators — Remove creators
+- [Import URLs](/raw/endpoints/lists/import-urls.md) - POST /v1/lists/:id/import-urls — Import LinkedIn URLs
+- [Import URLs (No List)](/raw/endpoints/lists/import-urls-no-list.md) - POST /v1/lists/import-urls — Import without list
+- [Check URLs](/raw/endpoints/lists/check-urls.md) - POST /v1/lists/check-urls — Validate LinkedIn URLs
+- [Share List](/raw/endpoints/lists/share-list.md) - POST /v1/lists/:id/share — Share with user
+- [Unshare List](/raw/endpoints/lists/unshare-list.md) - DELETE /v1/lists/:id/share — Remove sharing
+- [Get Share Users](/raw/endpoints/lists/get-share-users.md) - GET /v1/lists/:id/share-users — Users with access
+
+### Signals
+- [List Signals](/raw/endpoints/signals/list-signals.md) - GET /v1/signals — All signals
+- [Get Signal](/raw/endpoints/signals/get-signal.md) - GET /v1/signals/:id — Signal details
+- [Create Signal](/raw/endpoints/signals/create-signal.md) - POST /v1/signals — Create signal
+- [Update Signal](/raw/endpoints/signals/update-signal.md) - PUT /v1/signals/:id — Update signal
+- [Delete Signal](/raw/endpoints/signals/delete-signal.md) - DELETE /v1/signals/:id — Delete signal
+- [Get Signal Leads](/raw/endpoints/signals/get-signal-leads.md) - GET /v1/signals/:id/leads — Leads from signal
+
+### Leads
+- [List Leads](/raw/endpoints/leads/list-leads.md) - GET /v1/leads — All leads
+- [Get Lead](/raw/endpoints/leads/get-lead.md) - GET /v1/leads/:id — Lead details
+- [Update Lead](/raw/endpoints/leads/update-lead.md) - PUT /v1/leads/:id — Update lead
+- [Delete Lead](/raw/endpoints/leads/delete-lead.md) - DELETE /v1/leads/:id — Delete lead
+- [Get Leads by Signal](/raw/endpoints/leads/get-leads-by-signal.md) - GET /v1/signals/:id/leads — Filter by signal
+- [Export Leads](/raw/endpoints/leads/export-leads.md) - GET /v1/leads/export — CSV export
+
+### Companies
+- [List Companies](/raw/endpoints/companies/list-companies.md) - GET /v1/companies — All companies
+- [Get Company](/raw/endpoints/companies/get-company.md) - GET /v1/companies/:id — Company details
+- [Create Company](/raw/endpoints/companies/create-company.md) - POST /v1/companies — Create company
+- [Update Company](/raw/endpoints/companies/update-company.md) - PUT /v1/companies/:id — Update company
+- [Delete Company](/raw/endpoints/companies/delete-company.md) - DELETE /v1/companies/:id — Delete company
+- [Get Company Creators](/raw/endpoints/companies/get-company-creators.md) - GET /v1/companies/:id/creators — Creators
+- [Get Fields](/raw/endpoints/companies/get-fields.md) - GET /v1/companies/fields — Available fields
+- [Get Industries](/raw/endpoints/companies/get-industries.md) - GET /v1/companies/industries — Industry list
+
+### Tags
+- [List Tags](/raw/endpoints/tags/list-tags.md) - GET /v1/tags — All tags
+- [Get Tag](/raw/endpoints/tags/get-tag.md) - GET /v1/tags/:id — Tag details
+- [Create Tag](/raw/endpoints/tags/create-tag.md) - POST /v1/tags — Create tag
+- [Update Tag](/raw/endpoints/tags/update-tag.md) - PUT /v1/tags/:id — Update tag
+- [Delete Tag](/raw/endpoints/tags/delete-tag.md) - DELETE /v1/tags/:id — Delete tag
+- [Get Creator Tags](/raw/endpoints/tags/get-creator-tags.md) - GET /v1/creators/:id/tags — Tags on creator
+- [Set Creator Tags](/raw/endpoints/tags/set-creator-tags.md) - PUT /v1/creators/:id/tags — Replace all tags
+- [Add Creators to Tag](/raw/endpoints/tags/add-creators-to-tag.md) - POST /v1/tags/:id/creators — Bulk add
+- [Remove Creators from Tag](/raw/endpoints/tags/remove-creators-from-tag.md) - DELETE /v1/tags/:id/creators — Bulk remove
+- [Share Tag](/raw/endpoints/tags/share-tag.md) - POST /v1/tags/:id/share — Share tag
+- [Unshare Tag](/raw/endpoints/tags/unshare-tag.md) - DELETE /v1/tags/:id/share — Unshare tag
+- [Get Colors](/raw/endpoints/tags/get-colors.md) - GET /v1/tags/colors — Available colors
+
+### Insights
+- [Get Insights](/raw/endpoints/insights/get-insights.md) - GET /v1/creators/:id/insights — Creator insights
+- [Upsert Insights](/raw/endpoints/insights/upsert-insights.md) - PUT /v1/creators/:id/insights — Set insights
+- [Delete Insights](/raw/endpoints/insights/delete-insights.md) - DELETE /v1/creators/:id/insights — Remove insights
+- [Add Entry](/raw/endpoints/insights/add-entry.md) - POST /v1/creators/:id/insights/entries — Add entry
+- [Edit Entry](/raw/endpoints/insights/edit-entry.md) - PUT /v1/creators/:id/insights/entries/:entryId — Edit
+- [Delete Entry](/raw/endpoints/insights/delete-entry.md) - DELETE /v1/creators/:id/insights/entries/:entryId — Delete
+- [Get History](/raw/endpoints/insights/get-history.md) - GET /v1/creators/:id/insights/history — Change history
+- [AI Research](/raw/endpoints/insights/ai-research.md) - POST /v1/creators/:id/insights/research — AI research
+- [Toggle Sharing](/raw/endpoints/insights/toggle-sharing.md) - POST /v1/creators/:id/insights/sharing — Toggle
+
+### LinkedIn Lookups
+- [List Lookups](/raw/endpoints/linkedin-lookups/list-lookups.md) - GET /v1/linkedin-lookups — All lookups
+- [Get Lookup](/raw/endpoints/linkedin-lookups/get-lookup.md) - GET /v1/linkedin-lookups/:id — Lookup details
+- [Create Lookup](/raw/endpoints/linkedin-lookups/create-lookup.md) - POST /v1/linkedin-lookups — Queue lookup
+- [Bulk Create](/raw/endpoints/linkedin-lookups/bulk-create.md) - POST /v1/linkedin-lookups/bulk — Batch queue
+- [Delete Lookup](/raw/endpoints/linkedin-lookups/delete-lookup.md) - DELETE /v1/linkedin-lookups/:id — Delete
+- [Retry Lookup](/raw/endpoints/linkedin-lookups/retry-lookup.md) - POST /v1/linkedin-lookups/:id/retry — Retry failed
+- [Resume Paused](/raw/endpoints/linkedin-lookups/resume-paused.md) - POST /v1/linkedin-lookups/resume-paused — Resume
+- [Get Stats](/raw/endpoints/linkedin-lookups/get-stats.md) - GET /v1/linkedin-lookups/stats — Queue statistics
+
+### Deep Scrape
+- [Queue Creator](/raw/endpoints/deep-scrape/queue-creator.md) - POST /v1/deep-scrape — Queue for scraping
+- [List Queue](/raw/endpoints/deep-scrape/list-queue.md) - GET /v1/deep-scrape — Queue entries
+- [Resume Paused](/raw/endpoints/deep-scrape/resume-paused.md) - POST /v1/deep-scrape/resume-paused — Resume
+- [Get Stats](/raw/endpoints/deep-scrape/get-stats.md) - GET /v1/deep-scrape/stats — Queue statistics
+
+### AI Analysis
+- [Analyze Ethnicity](/raw/endpoints/ai-analysis/analyze-ethnicity.md) - POST /v1/ai/ethnicity — Single analysis
+- [Batch Analyze](/raw/endpoints/ai-analysis/batch-analyze-ethnicity.md) - POST /v1/ai/ethnicity/batch — Batch analysis
+
+### Integrations
+- [Get LinkedIn Status](/raw/endpoints/integrations/get-linkedin-status.md) - GET /v1/integrations/linkedin — Status
+- [Select Account](/raw/endpoints/integrations/select-account.md) - POST /v1/integrations/linkedin/select — Set account
+- [Send Reaction](/raw/endpoints/integrations/send-reaction.md) - POST /v1/integrations/linkedin/react — React
+- [Remove Reaction](/raw/endpoints/integrations/remove-reaction.md) - DELETE /v1/integrations/linkedin/react — Unreact
+- [Get Reactions](/raw/endpoints/integrations/get-reactions.md) - GET /v1/integrations/linkedin/reactions — Reactions
+- [Send Comment](/raw/endpoints/integrations/send-comment.md) - POST /v1/integrations/linkedin/comment — Comment
+
+### Stats
+- [Dashboard Stats](/raw/endpoints/stats/get-dashboard-stats.md) - GET /v1/stats/dashboard — Overview
+- [Creator Stats](/raw/endpoints/stats/get-creator-stats.md) - GET /v1/stats/creators — Creator metrics
+- [Post Stats](/raw/endpoints/stats/get-post-stats.md) - GET /v1/stats/posts — Post metrics
+- [Lead Stats](/raw/endpoints/stats/get-lead-stats.md) - GET /v1/stats/leads — Lead metrics
+
+### Usage
+- [Usage Stats](/raw/endpoints/usage/get-usage-stats.md) - GET /v1/usage/stats — API usage
+- [Usage Errors](/raw/endpoints/usage/get-usage-errors.md) - GET /v1/usage/errors — Error log
+
+## Examples
+- [cURL Quick Start](/raw/examples/curl/quick-start.md)
+- [JavaScript Quick Start](/raw/examples/javascript/quick-start.md)
+- [Python Quick Start](/raw/examples/python/quick-start.md)

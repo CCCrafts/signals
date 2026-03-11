@@ -1,0 +1,14 @@
+{
+  "name": "signals-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs && node scripts/copy-raw-md.js && node scripts/generate-llms-full.js",
+    "preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.3",
+    "wrangler": "^4.72.0"
+  }
+}
