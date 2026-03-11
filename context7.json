@@ -1,0 +1,22 @@
+{
+  "name": "signals-api",
+  "description": "signals.actor REST API — creator intelligence, LinkedIn enrichment, and engagement platform",
+  "version": "1.0.0",
+  "folders": ["docs"],
+  "rules": [
+    "Base URL is https://api.signals.actor/v1",
+    "All requests require an X-API-Key header with a valid API key (format: sk_ + 32 hex chars)",
+    "All responses use envelope format: { success: boolean, data: ..., meta?: { page, limit, total, totalPages } }",
+    "Error responses: { success: false, error: string }",
+    "Timestamps are Unix epoch seconds (not milliseconds)",
+    "Pagination uses ?page=N&limit=N (max 100, default 20)",
+    "Sorting uses ?sort=field&order=asc|desc",
+    "Team scoping is automatic — non-admin users only see creators assigned to their team",
+    "Admin-only endpoints return 403 for non-admin API keys",
+    "Credit costs: GOOGLE_LOOKUP=10, LINKEDIN_PROFILE=10, POST_SCRAPED=1, AI_ENRICHMENT=1, MEDIA_PROCESSED=1",
+    "Insufficient credits return HTTP 402 with { error: 'insufficient_credits', balance: number }",
+    "Enterprise teams have credits_balance=-1 (unlimited, no deduction)",
+    "IDs are UUIDs (v4)",
+    "Boolean fields are stored as 0/1 integers in responses"
+  ]
+}

@@ -1,0 +1,526 @@
+openapi: 3.0.3
+info:
+  title: signals.actor API
+  version: 1.0.0
+  description: |
+    The signals.actor API provides access to a creator intelligence platform.
+    Track LinkedIn creators, monitor their posts and engagement metrics,
+    manage curated lists, and discover new creators via LinkedIn lookups.
+
+    All endpoints require authentication via an API key passed in the
+    `X-API-Key` header.
+  contact:
+    email: support@signals.actor
+    url: https://signals.actor
+
+servers:
+  - url: https://api.signals.actor/v1
+    description: Production
+
+security:
+  - ApiKeyAuth: []
+
+tags:
+  - name: Creators
+    description: Browse, search, and manage creator profiles
+  - name: Posts
+    description: Search and filter creator posts
+  - name: Lists
+    description: Create and manage curated creator lists
+  - name: LinkedIn Lookups
+    description: Find LinkedIn profiles by name and company
+  - name: Usage
+    description: Monitor API key usage and errors
+
+paths:
+  /creators:
+    get:
+      summary: List creators
+      description: |
+        Returns a paginated list of creators. Supports search by name/headline,
+        filtering by vertical, AI tag, source type, and minimum followers,
+        and sorting by followers, engagement, name, post count, or creation date.
+      operationId: listCreators
+      tags: [Creators]
+      parameters:
+        - name: search
+          in: query
+          description: Search by name, headline, or LinkedIn URL
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [followers, engagement, created_at, name, post_count]
+            default: followers
+        - name: order
+          in: query
+          description: Sort direction
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: source_type
+          in: query
+          description: Filter by creator source type
+          schema:
+            type: string
+        - name: vertical
+          in: query
+          description: Filter by industry vertical
+          schema:
+            type: string
+        - name: ai_tag
+          in: query
+          description: Filter by AI-generated tag
+          schema:
+            type: string
+        - name: min_followers
+          in: query
+          description: Minimum total follower count
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Paginated list of creators
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Creator"
+                  meta:
+                    $ref: "#/components/schemas/PaginationMeta"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /creators/{id}:
+    get:
+      summary: Get a creator
+      description: Returns a single creator by ID.
+      operationId: getCreator
+      tags: [Creators]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Creator UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Creator details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Creator"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /posts:
+    get:
+      summary: List posts
+      description: |
+        Returns a paginated list of posts. Supports text search, filtering
+        by creator, platform, engagement threshold, list membership, and AI tags.
+      operationId: listPosts
+      tags: [Posts]
+      parameters:
+        - name: search
+          in: query
+          description: Full-text search in post content
+          schema:
+            type: string
+        - name: creator_id
+          in: query
+          description: Filter by creator UUID
+          schema:
+            type: string
+            format: uuid
+        - name: platform
+          in: query
+          description: Filter by platform
+          schema:
+            type: string
+        - name: min_engagement
+          in: query
+          description: Minimum total engagement
+          schema:
+            type: integer
+        - name: list_id
+          in: query
+          description: Filter by list membership
+          schema:
+            type: string
+            format: uuid
+        - name: ai_tag
+          in: query
+          description: Filter by creator's AI tag
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [engagement, likes, posted_at, created_at]
+            default: posted_at
+        - name: order
+          in: query
+          description: Sort direction
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Paginated list of posts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  meta:
+                    $ref: "#/components/schemas/PaginationMeta"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /lists:
+    post:
+      summary: Create a list
+      description: Creates a new curated list owned by the authenticated user.
+      operationId: createList
+      tags: [Lists]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                  description: List name
+                  example: Top SaaS Creators
+                description:
+                  type: string
+                  maxLength: 500
+                  description: Optional description
+                  example: High-engagement SaaS thought leaders
+      responses:
+        "201":
+          description: List created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      description:
+                        type: string
+                        nullable: true
+                      user_id:
+                        type: string
+                        format: uuid
+                      created_at:
+                        type: integer
+                        description: Unix timestamp
+                      updated_at:
+                        type: integer
+                        description: Unix timestamp
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication. Generate keys in the signals.actor dashboard.
+
+  schemas:
+    Creator:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Jane Smith
+        first_name:
+          type: string
+          example: Jane
+        last_name:
+          type: string
+          example: Smith
+        headline:
+          type: string
+          example: VP of Marketing at Acme
+        intro:
+          type: string
+          nullable: true
+        location:
+          type: string
+          example: San Francisco, CA
+        city:
+          type: string
+        country:
+          type: string
+        region:
+          type: string
+        linkedin_url:
+          type: string
+          format: uri
+          example: https://www.linkedin.com/in/janesmith
+        linkedin_username:
+          type: string
+        company:
+          type: string
+          example: Acme Inc
+        company_url:
+          type: string
+          format: uri
+        profile_photo:
+          type: string
+          format: uri
+        total_followers:
+          type: integer
+          example: 15200
+        linkedin_followers:
+          type: integer
+        engagement_rate:
+          type: number
+          format: float
+          example: 3.45
+        avg_engagement:
+          type: number
+          format: float
+        posts_per_day:
+          type: number
+          format: float
+        post_count_30d:
+          type: integer
+        likes_30d:
+          type: integer
+        comments_30d:
+          type: integer
+        top_verticals:
+          type: string
+          description: JSON array of industry verticals
+        ai_tags:
+          type: string
+          description: JSON array of AI-generated tags
+        source_type:
+          type: string
+        created_at:
+          type: integer
+          description: Unix timestamp
+        updated_at:
+          type: integer
+          description: Unix timestamp
+
+    Company:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Acme Inc
+        domain:
+          type: string
+          example: acme.com
+        logo_url:
+          type: string
+          format: uri
+          nullable: true
+        logo_source:
+          type: string
+          enum: [linkedin, logodev, custom, null]
+          nullable: true
+        linkedin_url:
+          type: string
+          format: uri
+        industry:
+          type: string
+        employee_count:
+          type: integer
+        created_at:
+          type: integer
+        updated_at:
+          type: integer
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        creator_id:
+          type: string
+          format: uuid
+        platform:
+          type: string
+          example: linkedin
+        text_preview:
+          type: string
+          description: Truncated post text
+        engagement:
+          type: integer
+          description: Total engagement (likes + comments + reposts)
+          example: 847
+        likes:
+          type: integer
+          example: 623
+        comments:
+          type: integer
+          example: 142
+        reposts:
+          type: integer
+          example: 82
+        posted_at:
+          type: integer
+          description: Unix timestamp of when the post was published
+        created_at:
+          type: integer
+          description: Unix timestamp of when the record was created
+        is_repost:
+          type: integer
+          enum: [0, 1]
+        linkedin_url:
+          type: string
+          format: uri
+        virality_tier_overall:
+          type: string
+          enum: [exceptional, viral, strong, above_average, null]
+          nullable: true
+        creator_name:
+          type: string
+          description: Joined from creators table
+        creator_company:
+          type: string
+          nullable: true
+
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        total:
+          type: integer
+          example: 5556
+        totalPages:
+          type: integer
+          example: 278
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: Resource not found
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            error: Invalid API key
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            error: Creator not found
