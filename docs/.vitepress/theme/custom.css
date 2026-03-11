@@ -1,0 +1,24 @@
+/* Larger nav logo — 50% bigger than default 24px */
+.VPNavBarTitle .logo {
+  height: 36px !important;
+  width: auto !important;
+}
+
+/* Hero illustration: make it large and prominent */
+.VPHero .VPImage.image-src {
+  max-width: 100% !important;
+  max-height: 520px !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.VPHero .image-container {
+  max-width: 640px !important;
+}
+
+/* Ensure hero image is large on desktop */
+@media (min-width: 960px) {
+  .VPHero .VPImage.image-src {
+    max-height: 560px !important;
+  }
+}

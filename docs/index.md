@@ -6,8 +6,8 @@ hero:
   text: Creator Intelligence Platform
   tagline: Track, analyze, and engage with creators at scale via a powerful REST API.
   image:
-    src: /logo.webp
-    alt: signals.actor
+    src: /hero-illustration.webp
+    alt: signals.actor API
   actions:
     - theme: brand
       text: Quick Start
