@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: 'signals.actor API',
+  title: 'Signals',
   description: 'Creator intelligence platform API documentation',
   head: [['link', { rel: 'icon', href: '/logo.webp' }]],
 

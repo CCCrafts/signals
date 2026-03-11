@@ -2,8 +2,8 @@
 layout: home
 
 hero:
-  name: signals.actor API
-  text: Creator Intelligence Platform
+  name: Signals
+  text: API
   tagline: Track, analyze, and engage with creators at scale via a powerful REST API.
   image:
     src: /hero-illustration.webp
