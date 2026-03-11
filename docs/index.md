@@ -4,7 +4,7 @@ layout: home
 hero:
   name: Signals
   text: API
-  tagline: Track, analyze, and engage with creators at scale via a powerful REST API.
+  tagline: "Track, analyze, and engage\nwith creators at scale via a powerful REST API."
   image:
     src: /hero-illustration.webp
     alt: signals.actor API
