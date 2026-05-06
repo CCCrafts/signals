@@ -1,6 +1,6 @@
 # List Posts
 
-Retrieve a paginated list of posts with creator information. Results are scoped to creators belonging to the authenticated user's team.
+Retrieve a paginated list of LinkedIn posts. Results are scoped to creators visible to the caller's team.
 
 ## Endpoint
 
@@ -8,7 +8,7 @@ Retrieve a paginated list of posts with creator information. Results are scoped 
 
 ## Authentication
 
-Required. Pass your API key via the `X-API-Key` header. Results are filtered to posts from creators belonging to your team.
+Required. Pass your API key via the `X-API-Key` header. Non-admin keys only see posts from creators on their team; admin keys see everything.
 
 ## Request
 
@@ -22,16 +22,41 @@ Required. Pass your API key via the `X-API-Key` header. Results are filtered to 
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| page | integer | 1 | Page number |
-| limit | integer | 20 | Results per page |
-| search | string | — | Search within post text |
-| creator_id | integer | — | Filter by creator ID |
-| platform | string | — | Filter by platform (e.g., `linkedin`) |
-| min_engagement | number | — | Minimum engagement score |
-| list_id | integer | — | Filter by creator list ID |
-| ai_tag | string | — | Filter by AI-generated tag |
-| sort | string | `posted_at` | Sort field: `engagement`, `likes`, `posted_at`, `created_at` |
-| order | string | `desc` | Sort order: `asc` or `desc` |
+| `page` | integer | `1` | Page number, 1-based. |
+| `limit` | integer | `20` | Page size, max `100`. |
+| `search` | string | — | Case-insensitive substring match (ILIKE) over `posts.text_preview`. |
+| `creator_id` | uuid | — | Restrict to a single creator. |
+| `platform` | string | — | Exact match on `posts.platform` (e.g. `linkedin`). |
+| `post_type` | enum | — | One of `post`, `article`, `repost`. |
+| `min_engagement` | integer | — | Only posts with `engagement >= min_engagement`. |
+| `list_id` | uuid | — | Restrict to creators in a single list. Mutually exclusive with `multi_list`. |
+| `multi_list` | csv of uuid | — | Restrict to creators in any of these lists (union). |
+| `ai_tags` | csv | — | Any-of match against `creators.ai_tags`. Example: `ai_tags=AI,Marketing`. |
+| `ai_tag` | string | — | **Deprecated.** Single-tag alias for `ai_tags`. Prefer `ai_tags`. |
+| `exclude_ai_tags` | csv | — | None-of match against `creators.ai_tags`. |
+| `country` | csv | — | Allowlist of creator countries. ISO-2 or common name. See [country normalization](#country-normalization). |
+| `exclude_country` | csv | — | Denylist of creator countries. |
+| `virality_tier_overall` | csv | — | Whitelist of overall virality tiers: `above_average`, `strong`, `viral`, `exceptional`. |
+| `is_repost` | `0` \| `1` \| `all` | `0` | `0` excludes reposts (new default). `1` only reposts. `all` both. |
+| `since` | unix int | — | Only posts with `posted_at >= since` (unix seconds). |
+| `sort` | enum | `posted_at` | One of `posted_at`, `created_at`, `engagement`, `likes`. |
+| `order` | `asc` \| `desc` | `desc` | Sort direction. |
+
+### Rejected parameters (HTTP 400)
+
+These parameters are explicitly rejected with `400 Bad Request` so callers fail fast rather than silently get wrong data.
+
+| Parameter | Replacement |
+|-----------|-------------|
+| `q` | Use `search`. The old `q` was undefined behavior. |
+| `hours` | Use `since`. Compute client-side: `Math.floor(Date.now()/1000) - hours*3600`. |
+| `offset` | Use `page` + `limit`. Offset-based pagination is no longer supported in v1. |
+
+Example error response:
+
+```json
+{ "success": false, "error": "Use 'since=<unix>' instead of 'hours'" }
+```
 
 ## Response
 
@@ -41,52 +66,127 @@ Required. Pass your API key via the `X-API-Key` header. Results are filtered to 
 
 ```json
 {
+  "success": true,
   "data": [
     {
-      "id": 1001,
-      "creator_id": 101,
+      "id": "0a1b2c3d-...",
+      "creator_id": "ff66...",
       "platform": "linkedin",
       "text_preview": "Excited to announce our latest product launch...",
-      "likes": 342,
-      "comments": 58,
-      "reposts": 27,
-      "engagement": 427,
-      "posted_at": "2026-03-08T14:20:00Z",
-      "created_at": "2026-03-08T15:00:00Z",
-      "creator": {
-        "id": 101,
-        "name": "Jane Smith",
-        "linkedin_url": "https://linkedin.com/in/janesmith"
-      }
+      "engagement": 462,
+      "likes": 412,
+      "comments": 38,
+      "reposts": 12,
+      "posted_at": 1746489600,
+      "created_at": 1746489650,
+      "is_repost": 0,
+      "linkedin_url": "https://www.linkedin.com/posts/...",
+      "linkedin_urn": "urn:li:activity:...",
+      "virality_tier_overall": "viral",
+      "virality_tier_likes": "strong",
+      "virality_tier_comments": "above_average",
+      "virality_tier_reposts": null,
+      "virality_checked_at": 1746500000,
+      "virality_status": "analyzed",
+      "creator_name": "Jane Doe",
+      "creator_linkedin": "https://www.linkedin.com/in/janedoe",
+      "creator_photo": "https://...",
+      "creator_ai_tags": "[\"AI\",\"Marketing\"]",
+      "creator_company": "Acme",
+      "creator_country": "US",
+      "creator_location": "San Francisco, California, United States"
     }
   ],
-  "pagination": {
+  "meta": {
     "page": 1,
     "limit": 20,
-    "total": 520,
-    "total_pages": 26
+    "total": 1842,
+    "totalPages": 93
   }
 }
 ```
+
+### Field notes
+
+- `text_preview`: truncated post body. The full `posts.text` is **not** returned by the list endpoint — use [`GET /v1/posts/:id`](get-post.md) to retrieve it.
+- `creator_ai_tags`: JSON-encoded string array (e.g. `"[\"AI\",\"Marketing\"]"`). Parse with `JSON.parse()` before use.
+- `virality_status`: `'analyzed'` or `'pending'`, derived from `posts.virality_checked_at`. When `pending`, all four `virality_tier_*` fields are `null` because no analysis has run yet — this is **not** the same as a tier of "below threshold". When `analyzed`, the tier fields are authoritative; `null` means the post fell below the threshold for that dimension.
+- `virality_tier_*`: one of `above_average`, `strong`, `viral`, `exceptional`, or `null`.
+- `creator_country`: ISO-2 or longer name as stored on the creator. Use the country normalization table below to filter consistently.
+- `creator_location`: free-text city / region / country string.
+- `is_repost`: integer `0` or `1`.
+- The envelope is `{ success: true, data: [...], meta: { page, limit, total, totalPages } }`. There is no nested `creator: {...}` object — creator fields are flattened with a `creator_` prefix.
+
+> **Note:** `virality_tier_reposts: null` while `virality_status: "analyzed"` is normal. It means the post was analyzed but fell below the "above_average" threshold for the reposts dimension. `null` on an analyzed post means "below threshold", not "missing data".
 
 ### Errors
 
 | Code | Error | Description |
 |------|-------|-------------|
-| 401 | Unauthorized | Missing or invalid API key |
-| 403 | Forbidden | Insufficient permissions |
-| 500 | Internal Server Error | Server error |
+| 400 | Bad Request | Rejected parameter (`q`, `hours`, `offset`), malformed CSV, invalid uuid, invalid `is_repost` value, etc. |
+| 401 | Unauthorized | Missing or invalid `X-API-Key`. |
+| 403 | Forbidden | Insufficient permissions. |
+| 429 | Too Many Requests | Rate limit exceeded (1000 req/hr/key). |
+| 500 | Internal Server Error | Server error. |
 
-## Example
+## Country normalization
+
+The `country` and `exclude_country` filters apply an alias map server-side. Each input token is expanded into the full set of `creators.country` strings that should match it, then the expansion is used in a SQL `IN (...)` clause. The DB is messy (some rows are `'US'`, some `'USA'`, some `'United States'`, some lowercase) and the alias map smooths that over.
+
+Lookup is case-insensitive. Unknown tokens are passed through as a single exact-match value (no expansion).
+
+| Input aliases the API accepts | DB country-column values that match |
+|-------------------------------|-------------------------------------|
+| `US`, `USA`, `United States`, `United States of America`, `U.S.`, `U.S.A.`, `America` | `US`, `USA`, `United States`, `United States of America`, `united states`, `usa` |
+| `GB`, `UK`, `United Kingdom`, `Great Britain`, `Britain`, `England` | `GB`, `UK`, `United Kingdom`, `Great Britain`, `united kingdom`, `uk`, `gb` |
+| `DE`, `DEU`, `Germany`, `Deutschland` | `DE`, `DEU`, `Germany`, `germany` |
+
+## Examples
 
 ```bash
-curl -X GET "https://api.signals.actor/v1/posts?page=1&limit=10&creator_id=101&sort=engagement&order=desc" \
-  -H "X-API-Key: YOUR_API_KEY"
+# 1. All posts in a single list, page 2
+curl -H "X-API-Key: $KEY" \
+  "https://api.signals.actor/v1/posts?list_id=8e2f...&page=2&limit=50"
+
+# 2. Posts from US/UK/Canadian creators only
+curl -H "X-API-Key: $KEY" \
+  "https://api.signals.actor/v1/posts?country=US,GB,CA"
+
+# 3. Exclude India / Pakistan / Singapore
+curl -H "X-API-Key: $KEY" \
+  "https://api.signals.actor/v1/posts?exclude_country=IN,PK,SG"
+
+# 4. Last 24 hours (since = now - 86400)
+SINCE=$(( $(date +%s) - 86400 ))
+curl -H "X-API-Key: $KEY" \
+  "https://api.signals.actor/v1/posts?since=$SINCE"
+
+# 5. AI/Marketing creators with viral or exceptional posts, no reposts
+curl -H "X-API-Key: $KEY" \
+  "https://api.signals.actor/v1/posts?ai_tags=AI,Marketing&virality_tier_overall=viral,exceptional&is_repost=0"
+
+# 6. Combine multiple lists into one query
+curl -H "X-API-Key: $KEY" \
+  "https://api.signals.actor/v1/posts?multi_list=8e2f...,1a90...,c4d2..."
+
+# 7. Search post text
+curl -H "X-API-Key: $KEY" \
+  "https://api.signals.actor/v1/posts?search=AI%20agents&limit=20"
 ```
+
+## Breaking changes
+
+::: warning is_repost default changed
+`is_repost` now defaults to `0` (reposts excluded). Previously the endpoint included reposts by default. To restore prior behavior pass `is_repost=all`; to retrieve only reposts pass `is_repost=1`.
+:::
+
+::: warning Rejected parameters
+`q`, `hours`, and `offset` are now rejected with `400`. Migrate to `search`, `since`, and `page`+`limit` respectively.
+:::
 
 ## Notes
 
-- Results are team-scoped: only posts from creators belonging to your team are returned.
-- The `text_preview` field is a truncated version of the full post text. Use the [Get Post](get-post.md) endpoint for the complete text.
+- Results are team-scoped for non-admin keys.
+- Multiple filters can be combined freely (e.g. `country` + `ai_tags` + `virality_tier_overall` + `since`).
 - The `engagement` field is the sum of likes, comments, and reposts.
-- Multiple filters can be combined (e.g., `creator_id` + `min_engagement` + `ai_tag`).
+- Pagination is page-based only; `offset` is rejected with `400`.
