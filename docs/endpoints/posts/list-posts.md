@@ -37,6 +37,7 @@ Required. Pass your API key via the `X-API-Key` header. Non-admin keys only see 
 | `country` | csv | — | Allowlist of creator countries. ISO-2 or common name. See [country normalization](#country-normalization). |
 | `exclude_country` | csv | — | Denylist of creator countries. |
 | `virality_tier_overall` | csv | — | Whitelist of overall virality tiers: `above_average`, `strong`, `viral`, `exceptional`. |
+| `virality_band` | csv | — | Alias for `virality_tier_overall` matching the response field name. Pass exactly one of the two; both → `400`. |
 | `is_repost` | `0` \| `1` \| `all` | `0` | `0` excludes reposts (new default). `1` only reposts. `all` both. |
 | `since` | unix int | — | Only posts with `posted_at >= since` (unix seconds). |
 | `sort` | enum | `posted_at` | One of `posted_at`, `created_at`, `engagement`, `likes`. |
@@ -56,6 +57,15 @@ Example error response:
 
 ```json
 { "success": false, "error": "Use 'since=<unix>' instead of 'hours'" }
+```
+
+### Strict mode: unknown parameters reject with 400
+
+Any query parameter the endpoint doesn't recognize is rejected with HTTP 400 listing the offender(s). This catches typos like `?virality_band_overall=` or `?ai_tag_s=` that previously fell through silently and broadened results.
+
+```bash
+curl "https://api.signals.actor/v1/posts?virality_band_oerall=viral" -H "X-API-Key: $KEY"
+# → 400 {"success": false, "error": "Unknown query parameter(s): virality_band_oerall. See https://docs.signals.actor/endpoints/posts/list-posts for the full list."}
 ```
 
 ## Response
