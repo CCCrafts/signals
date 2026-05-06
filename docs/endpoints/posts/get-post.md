@@ -52,6 +52,7 @@ Required. Pass your API key via the `X-API-Key` header. The post's creator must 
     "virality_tier_likes": "strong",
     "virality_tier_comments": "above_average",
     "virality_tier_reposts": null,
+    "virality_band": "viral",
     "virality_checked_at": 1746500000,
     "virality_status": "analyzed",
     "creator_name": "Jane Doe",
@@ -60,6 +61,7 @@ Required. Pass your API key via the `X-API-Key` header. The post's creator must 
     "creator_ai_tags": "[\"AI\",\"Marketing\"]",
     "creator_company": "Acme",
     "creator_country": "US",
+    "creator_country_iso": "US",
     "creator_location": "San Francisco, California, United States"
   }
 }
@@ -71,7 +73,10 @@ Required. Pass your API key via the `X-API-Key` header. The post's creator must 
 - `text_preview`: truncated body, included for convenience and parity with the list response.
 - `creator_ai_tags`: JSON-encoded string array. Parse with `JSON.parse()`.
 - `virality_status`: `'analyzed'` or `'pending'`. When `pending`, all `virality_tier_*` fields are `null` (no analysis run yet). When `analyzed`, `null` on a tier means the post fell below threshold for that dimension.
-- `creator_country` / `creator_location`: country code/name and free-text location string from the creator record.
+- `virality_band`: explicit, never-null counterpart to `virality_tier_overall`. One of `pending`, `regular`, `above_average`, `strong`, `viral`, `exceptional`. Logic: `'pending'` when `virality_status='pending'`; otherwise `virality_tier_overall` if non-empty; otherwise `'regular'` (analyzed but below the `above_average` threshold). Use this when you want a single field that disambiguates "not yet analyzed" from "analyzed but below threshold".
+- `creator_country`: raw value as stored on the creator (may be `'US'`, `'USA'`, `'United States'`, `'united states'`, etc).
+- `creator_country_iso`: ISO-3166-1 alpha-2 normalization of `creator_country`. `'United States' → 'US'`, `'Portugal' → 'PT'`, `'Czech Republic' → 'CZ'`, `'PRT' → 'PT'`. Alpha-3 codes are also accepted as input. Returns `null` when the stored value isn't recognizable.
+- `creator_location`: free-text city / region / country string from the creator record.
 - The envelope is `{ success: true, data: {...} }` with no `meta` object.
 
 ### Errors

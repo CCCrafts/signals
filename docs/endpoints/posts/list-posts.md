@@ -86,6 +86,7 @@ Example error response:
       "virality_tier_likes": "strong",
       "virality_tier_comments": "above_average",
       "virality_tier_reposts": null,
+      "virality_band": "viral",
       "virality_checked_at": 1746500000,
       "virality_status": "analyzed",
       "creator_name": "Jane Doe",
@@ -94,6 +95,7 @@ Example error response:
       "creator_ai_tags": "[\"AI\",\"Marketing\"]",
       "creator_company": "Acme",
       "creator_country": "US",
+      "creator_country_iso": "US",
       "creator_location": "San Francisco, California, United States"
     }
   ],
@@ -101,7 +103,13 @@ Example error response:
     "page": 1,
     "limit": 20,
     "total": 1842,
-    "totalPages": 93
+    "totalPages": 93,
+    "applied_filters": {
+      "is_repost": "0",
+      "country": ["US", "GB"],
+      "virality_tier_overall": ["viral", "exceptional"],
+      "min_engagement": 100
+    }
   }
 }
 ```
@@ -112,12 +120,25 @@ Example error response:
 - `creator_ai_tags`: JSON-encoded string array (e.g. `"[\"AI\",\"Marketing\"]"`). Parse with `JSON.parse()` before use.
 - `virality_status`: `'analyzed'` or `'pending'`, derived from `posts.virality_checked_at`. When `pending`, all four `virality_tier_*` fields are `null` because no analysis has run yet — this is **not** the same as a tier of "below threshold". When `analyzed`, the tier fields are authoritative; `null` means the post fell below the threshold for that dimension.
 - `virality_tier_*`: one of `above_average`, `strong`, `viral`, `exceptional`, or `null`.
-- `creator_country`: ISO-2 or longer name as stored on the creator. Use the country normalization table below to filter consistently.
+- `virality_band`: explicit, never-null counterpart to `virality_tier_overall`. One of `pending`, `regular`, `above_average`, `strong`, `viral`, `exceptional`. Logic: `'pending'` when `virality_status='pending'`; otherwise `virality_tier_overall` if non-empty; otherwise `'regular'` (analyzed but below the `above_average` threshold). Use this when you want a single field that disambiguates "not yet analyzed" from "analyzed but below threshold". About 93% of analyzed posts fall into `regular`.
+- `creator_country`: ISO-2 or longer name as stored on the creator (raw value, may be `'US'`, `'USA'`, `'United States'`, `'united states'`, etc). Use the country normalization table below to filter consistently.
+- `creator_country_iso`: ISO-3166-1 alpha-2 normalization of `creator_country`. `'United States' → 'US'`, `'Portugal' → 'PT'`, `'Czech Republic' → 'CZ'`, `'PRT' → 'PT'`. Alpha-3 codes are also accepted as input. Returns `null` when the stored value isn't recognizable. Prefer this for client-side grouping or charting.
 - `creator_location`: free-text city / region / country string.
 - `is_repost`: integer `0` or `1`.
-- The envelope is `{ success: true, data: [...], meta: { page, limit, total, totalPages } }`. There is no nested `creator: {...}` object — creator fields are flattened with a `creator_` prefix.
+- The envelope is `{ success: true, data: [...], meta: { page, limit, total, totalPages, applied_filters } }`. There is no nested `creator: {...}` object — creator fields are flattened with a `creator_` prefix.
 
 > **Note:** `virality_tier_reposts: null` while `virality_status: "analyzed"` is normal. It means the post was analyzed but fell below the "above_average" threshold for the reposts dimension. `null` on an analyzed post means "below threshold", not "missing data".
+
+### Filter transparency
+
+::: tip meta.applied_filters
+The response echoes back which filters actually contributed to the WHERE clause via `meta.applied_filters`. Use it to confirm a filter took effect rather than guessing from total counts (e.g. "did my `country=PT` get parsed, or does the empty result mean no PT posts exist?").
+
+- `is_repost` is always present (it has a default of `0`).
+- Other keys appear only when the client passed a non-empty value.
+- `min_engagement` only appears when truthy (i.e. omitted when `0` or unset).
+- CSV-valued filters (`country`, `exclude_country`, `ai_tags`, `exclude_ai_tags`, `virality_tier_overall`, `multi_list`) appear as arrays of the parsed tokens.
+:::
 
 ### Errors
 
@@ -172,6 +193,31 @@ curl -H "X-API-Key: $KEY" \
 # 7. Search post text
 curl -H "X-API-Key: $KEY" \
   "https://api.signals.actor/v1/posts?search=AI%20agents&limit=20"
+
+# 8. Verify which filters were applied via meta.applied_filters
+curl -H "X-API-Key: $KEY" \
+  "https://api.signals.actor/v1/posts?country=US,GB&virality_tier_overall=viral,exceptional&min_engagement=100&limit=1"
+```
+
+The response from example 8 includes:
+
+```json
+{
+  "success": true,
+  "data": [ /* ... */ ],
+  "meta": {
+    "page": 1,
+    "limit": 1,
+    "total": 312,
+    "totalPages": 312,
+    "applied_filters": {
+      "is_repost": "0",
+      "country": ["US", "GB"],
+      "virality_tier_overall": ["viral", "exceptional"],
+      "min_engagement": 100
+    }
+  }
+}
 ```
 
 ## Breaking changes
