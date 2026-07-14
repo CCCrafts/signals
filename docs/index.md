@@ -35,4 +35,7 @@ features:
   - title: AI Analysis
     details: Leverage AI-powered enrichment for creator demographics, content analysis, and automated tagging.
     link: /endpoints/ai-analysis/analyze-ethnicity
+  - title: Engagements
+    details: Log LinkedIn engagements your accounts perform, read them back per day or per creator, and pace outreach with de-duplication built in.
+    link: /endpoints/engagements/list-engagements
 ---

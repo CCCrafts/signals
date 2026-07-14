@@ -168,6 +168,11 @@ curl -X POST -H "X-API-Key: sk_your_key_here" \
 | | POST | [`/v1/integrations/linkedin/comment`](docs/endpoints/integrations/send-comment.md) | Post LinkedIn comment |
 | | POST | [`/v1/integrations/linkedin/select-account`](docs/endpoints/integrations/select-account.md) | Select LinkedIn account |
 | | GET | [`/v1/integrations/linkedin/reactions`](docs/endpoints/integrations/get-reactions.md) | Get user's reactions |
+| **Engagements** | | | |
+| | GET | [`/v1/engagements`](docs/endpoints/engagements/list-engagements.md) | List logged engagements (user-private) |
+| | POST | [`/v1/engagements`](docs/endpoints/engagements/create-engagement.md) | Log an engagement (de-duplicated) |
+| | GET | [`/v1/engagements/counters`](docs/endpoints/engagements/get-counters.md) | Per-account sent counts for a UTC day |
+| | GET | [`/v1/engagements/last`](docs/endpoints/engagements/get-last-touch.md) | Last touch per account for a creator |
 
 ---
 

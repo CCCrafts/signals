@@ -195,6 +195,16 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Engagements',
+        collapsed: true,
+        items: [
+          { text: 'List Engagements', link: '/endpoints/engagements/list-engagements' },
+          { text: 'Create Engagement', link: '/endpoints/engagements/create-engagement' },
+          { text: 'Get Counters', link: '/endpoints/engagements/get-counters' },
+          { text: 'Get Last Touch', link: '/endpoints/engagements/get-last-touch' },
+        ],
+      },
+      {
         text: 'Stats',
         collapsed: true,
         items: [
