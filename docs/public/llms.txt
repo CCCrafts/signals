@@ -143,6 +143,12 @@ Base URL: https://api.signals.actor/v1
 - [Get Reactions](/raw/endpoints/integrations/get-reactions.md) - GET /v1/integrations/linkedin/reactions — Reactions
 - [Send Comment](/raw/endpoints/integrations/send-comment.md) - POST /v1/integrations/linkedin/comment — Comment
 
+### Engagements
+- [List Engagements](/raw/endpoints/engagements/list-engagements.md) - GET /v1/engagements — List logged engagements (user-private)
+- [Create Engagement](/raw/endpoints/engagements/create-engagement.md) - POST /v1/engagements — Log an engagement (de-duplicated)
+- [Get Counters](/raw/endpoints/engagements/get-counters.md) - GET /v1/engagements/counters — Per-account sent counts for a UTC day
+- [Get Last Touch](/raw/endpoints/engagements/get-last-touch.md) - GET /v1/engagements/last — Last touch per account + posts_since
+
 ### Stats
 - [Dashboard Stats](/raw/endpoints/stats/get-dashboard-stats.md) - GET /v1/stats/dashboard — Overview
 - [Creator Stats](/raw/endpoints/stats/get-creator-stats.md) - GET /v1/stats/creators — Creator metrics
