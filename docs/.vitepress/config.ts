@@ -195,6 +195,19 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Engagement Layer',
+        collapsed: true,
+        items: [
+          { text: 'Overview', link: '/endpoints/engagement-layer/' },
+          { text: 'Get Engagers (inbound)', link: '/endpoints/engagement-layer/get-engagers' },
+          { text: 'Get Engaged (outbound)', link: '/endpoints/engagement-layer/get-engaged' },
+          { text: 'Request Scan', link: '/endpoints/engagement-layer/request-scan' },
+          { text: 'Poll Scan Job', link: '/endpoints/engagement-layer/poll-scan' },
+          { text: 'Subscribe (keep-fresh)', link: '/endpoints/engagement-layer/subscribe' },
+          { text: 'Get Coverage', link: '/endpoints/engagement-layer/get-coverage' },
+        ],
+      },
+      {
         text: 'Engagements',
         collapsed: true,
         items: [
