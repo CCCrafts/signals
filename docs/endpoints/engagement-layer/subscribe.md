@@ -31,7 +31,9 @@ Standing subscription that keeps engagement data fresh on a cadence — no one-s
 - **outbound** — the person's activity re-scans on cadence. Incremental stop makes
   each re-scan typically 1–2 pages (~$0.004 vendor side).
 - **DELETE** — inbound: stops the subscription (read-gate closes, scanning stops);
-  outbound: clears the recurrence (collected data stays readable via team visibility).
+  outbound: removes **your team** from the shared subscription — the recurrence only
+  ends when the **last** subscribed team leaves (collected data stays readable via
+  team visibility). One shared scan serves every subscribed team.
 
 ## Response
 

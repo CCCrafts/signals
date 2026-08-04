@@ -9,6 +9,11 @@ fresh-vs-refetch without spending a scan.
 
 Gate: creator in your `team_creators` or an audience subscription (admin: any).
 
+`outbound.covered_until` is the oldest timestamp a completed scan has walked to —
+if it is newer than the window you need, request a scan with a longer
+`lookback_months` and the worker will paginate down to the new cutoff
+(already-seen items are deduplicated; you pay only for the extra pages).
+
 ## Response
 
 ```json
@@ -24,6 +29,7 @@ Gate: creator in your `team_creators` or an audience subscription (admin: any).
     "outbound": {
       "subscribed": false, "cadence": null, "scanned": true,
       "status": "done", "scan_count": 3, "last_scanned_at": "…",
+      "covered_until": "2026-02-05T…",
       "edges_total": 123, "distinct_authors": 37, "last_edge_seen_at": "…"
     }
   }
