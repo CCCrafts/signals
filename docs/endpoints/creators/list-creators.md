@@ -29,7 +29,9 @@ Required. Team-scoped — results are filtered to creators assigned to the authe
 | `vertical` | string | — | Filter by industry vertical |
 | `ai_tag` | string | — | Filter by AI-generated tag |
 | `min_followers` | integer | — | Minimum follower count |
-| `sort` | string | `created_at` | Sort field. One of: `followers`, `engagement`, `created_at`, `name`, `post_count` |
+| `seniority` | string | — | Filter by seniority level, comma-separated. Values: `c_level`, `founder`, `vp`, `director`, `manager`, `ic` |
+| `role_tag` | string | — | Filter by special role tag. One of: `founder`, `investor`, `advisor`, `board_member` |
+| `sort` | string | `created_at` | Sort field. One of: `followers`, `engagement`, `created_at`, `name`, `post_count`, `last_post_at`, `seniority` (with default `order=desc`, C-level ranks first) |
 | `order` | string | `desc` | Sort direction. One of: `asc`, `desc` |
 
 ## Response
@@ -50,6 +52,9 @@ Required. Team-scoped — results are filtered to creators assigned to the authe
       "linkedin_followers": 15200,
       "profile_photo": "https://example.com/photo.jpg",
       "company": "Acme Corp",
+      "current_position": "VP Marketing",
+      "seniority_level": "vp",
+      "role_tags": "[\"advisor\"]",
       "source_type": "linkedin",
       "vertical": "Marketing",
       "post_count": 42,

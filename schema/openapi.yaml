@@ -97,6 +97,24 @@ paths:
           description: Minimum total follower count
           schema:
             type: integer
+        - name: seniority
+          in: query
+          description: "Filter by seniority level, comma-separated (e.g. c_level,founder)"
+          schema:
+            type: string
+            example: c_level,founder
+        - name: role_tag
+          in: query
+          description: Filter by special role tag
+          schema:
+            type: string
+            enum: [founder, investor, advisor, board_member]
+        - name: sort
+          in: query
+          description: "Sort field; seniority ranks C-level first with order=desc (default)"
+          schema:
+            type: string
+            enum: [followers, engagement, created_at, name, post_count, last_post_at, seniority]
       responses:
         "200":
           description: Paginated list of creators
@@ -377,6 +395,16 @@ components:
         ai_tags:
           type: string
           description: JSON array of AI-generated tags
+        current_position:
+          type: string
+          description: Current job title, derived from work experience
+        seniority_level:
+          type: string
+          description: "Classified seniority: c_level, founder, vp, director, manager, ic"
+          enum: [c_level, founder, vp, director, manager, ic]
+        role_tags:
+          type: string
+          description: "JSON array of special role tags: founder, investor, advisor, board_member"
         source_type:
           type: string
         created_at:
