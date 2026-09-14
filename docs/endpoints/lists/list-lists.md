@@ -94,3 +94,30 @@ curl https://api.signals.actor/v1/lists \
 - `shared` contains lists shared with the user by others, including a `permission` field (`read` or `write`) and `shared_by` / `shared_by_name`.
 - `member_count` is **string-encoded** — apply `parseInt()` before doing arithmetic on it.
 - The envelope is `{ success: true, data: { owned, shared } }`.
+
+## Partner member lists
+
+`GET /v1/partner/teams/:id/members/:mid/lists` uses `X-Partner-Key: pk_...`
+and returns the specified active member's `owned` and `shared` lists. The
+partner must own the active team. Owned lists are ordered by update time;
+shared lists by sharing time, newest first.
+
+| Query parameter | Values | Default | Description |
+| --- | --- | --- | --- |
+| `include_readiness` | `true`, `false`, `1`, `0` | `true` | Include profile/post processing summaries. Set `false` for quota checks or list selectors that only need metadata and counts. |
+
+```bash
+curl -H "X-Partner-Key: pk_..." \
+  "https://api.signals.actor/v1/partner/teams/team-id/members/member-id/lists?include_readiness=false"
+```
+
+With `false` or `0`, each list still contains its exact, string-encoded
+`member_count`, but has no `readiness` field. This mode does not inspect
+profile or post queues. With the default `true`, `readiness` contains `total`,
+`ready`, `processing`, `failed`, `no_posts`, `not_tracked`, `queued`,
+`profile_loading`, `posts_loading`, and `ready_percent`. Readiness describes
+the team's accessible profiles; `member_count` counts all list members.
+
+The response also includes `meta.team_id` and `meta.member_id`. Invalid flag
+values return `400`; an inactive team returns `403`; an inaccessible team or
+missing/inactive member returns `404`.

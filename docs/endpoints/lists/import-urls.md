@@ -76,3 +76,21 @@ curl -X POST https://api.signals.actor/v1/lists/lst_abc123/import \
 - New creators are automatically queued for LinkedIn profile enrichment.
 - All creators (new and existing) are added to both the specified list and the team.
 - Maximum of 100 URLs per request.
+
+## Partner member import
+
+`POST /v1/partner/teams/:id/members/:mid/lists/:listId/import` uses
+`X-Partner-Key: pk_...` and the same `linkedin_urls` body. The active member
+must own the list or have write access to it.
+
+Normalized duplicate URLs are processed once. Response counters still account
+for every input occurrence: for example, importing the same new URL three
+times returns `created: 1`, `existing: 2`, and `added: 1`. Repeating that request
+returns `created: 0`, `existing: 3`, and `added: 0`.
+
+The partner response wraps these fields in `{ "success": true, "data": { ... } }`.
+`added` is the actual number of new list memberships and numeric `total` is
+the committed list size. Valid URLs are saved atomically; invalid URLs count
+as `skipped`. Insufficient credits return `402` and database failures return
+`500`, without partially adding the valid batch. Profile enrichment and post
+collection run asynchronously after membership is saved.
